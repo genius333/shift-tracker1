@@ -297,8 +297,8 @@
                 <input type="number" id="shiftHours" placeholder="8" step="0.5" min="0.5" inputmode="decimal">
             </div>
             <div class="form-group">
-                <label>Ставка (₽/час)</label>
-                <input type="number" id="shiftRate" placeholder="500" step="1" min="0" inputmode="decimal">
+                <label>Сумма за смену (₽)</label>
+                <input type="number" id="shiftRate" placeholder="2500" step="1" min="0" inputmode="decimal">
             </div>
         </div>
         <div class="form-group">
@@ -378,7 +378,7 @@
 
             const date = dateInput.value;
             const hours = parseFloat(hoursInput.value.replace(',', '.'));
-            const rate = parseFloat(rateInput.value.replace(',', '.'));
+            const amount = parseFloat(rateInput.value.replace(',', '.'));
             const note = noteInput.value.trim();
 
             if (!date) {
@@ -389,8 +389,8 @@
                 showToast('Введите корректные часы', true);
                 return;
             }
-            if (isNaN(rate) || rate < 0) {
-                showToast('Введите корректную ставку', true);
+            if (isNaN(amount) || amount <= 0) {
+                showToast('Введите сумму за смену', true);
                 return;
             }
 
@@ -399,9 +399,8 @@
                 id: generateId(),
                 date: date,
                 hours: hours,
-                rate: rate,
+                amount: amount,
                 note: note,
-                total: Math.round(hours * rate * 100) / 100,
                 createdAt: new Date().toISOString()
             };
 
@@ -417,7 +416,7 @@
             currentYear = shiftDate.getFullYear();
 
             render();
-            showToast(`✅ Смена добавлена! +${newShift.total.toLocaleString('ru-RU')} ₽`);
+            showToast(`✅ Смена добавлена! +${newShift.amount.toLocaleString('ru-RU')} ₽`);
         }
 
         function deleteShift(id) {
@@ -451,7 +450,7 @@
             }).sort((a, b) => new Date(b.date) - new Date(a.date));
 
             const totalHours = monthShifts.reduce((sum, s) => sum + s.hours, 0);
-            const totalEarnings = monthShifts.reduce((sum, s) => sum + s.total, 0);
+            const totalEarnings = monthShifts.reduce((sum, s) => sum + s.amount, 0);
 
             document.getElementById('totalHours').textContent = totalHours.toFixed(1);
             document.getElementById('totalEarnings').textContent = totalEarnings.toLocaleString('ru-RU', {maximumFractionDigits: 2}) + ' ₽';
@@ -475,10 +474,10 @@
                     <div class="shift-item">
                         <div class="shift-info">
                             <div class="shift-date">${dateStr}</div>
-                            <div class="shift-details">${s.hours} ч × ${s.rate} ₽</div>
+                            <div class="shift-details">${s.hours} ч</div>
                             ${noteHtml}
                         </div>
-                        <div class="shift-earnings">${s.total.toLocaleString('ru-RU', {maximumFractionDigits: 2})} ₽</div>
+                        <div class="shift-earnings">${s.amount.toLocaleString('ru-RU', {maximumFractionDigits: 2})} ₽</div>
                         <button class="shift-delete" onclick="deleteShift('${s.id}')">✕</button>
                     </div>
                 `;
@@ -509,4 +508,4 @@
         render();
     </script>
 </body>
-  </html>
+</html>
